@@ -1,0 +1,133 @@
+# Basic Gateway Configuration
+micronaut:
+  application:
+    name: api-gateway
+    type: application
+  server:
+    port: 8080
+    cors:
+      enabled: true
+      configurations:
+        web:
+          allowed-origins:
+            - http://localhost:3000
+            - http://localhost:8080
+          allowed-methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          allowed-headers:
+            - "*"
+          allow-credentials: true
+
+  security:
+    enabled: true
+    reject-not-found: false
+    authentication: bearer
+    token:
+      jwt:
+        enabled: true
+        signatures:
+          secret:
+            generator:
+              secret: mySecretKeyThatShouldBeAtLeast256BitsLongForHS256AlgorithmPleaseChangeInProduction
+        generator:
+          access-token:
+            expiration: 3600
+    intercept-url-map:
+      - pattern: /health
+        access:
+          - isAnonymous()
+      - pattern: /login
+        access:
+          - isAnonymous()
+      - pattern: /api/auth/login
+        access:
+          - isAnonymous()
+      - pattern: /api/users
+        http-method: GET
+        access:
+          - isAuthenticated()
+      - pattern: /api/users
+        http-method: POST
+        access:
+          - hasRole('ADMIN')
+      - pattern: /api/users/**
+        http-method: PUT
+        access:
+          - hasAnyRole('USER','ADMIN')
+      - pattern: /api/users/**
+        http-method: DELETE
+        access:
+          - hasRole('ADMIN')
+      - pattern: /api/notifications/**
+        access:
+          - isAuthenticated()
+      # - pattern: /api/**
+      #   access:
+      #     - isAuthenticated()
+
+  router:
+    routes:
+      - id: user-service
+        uri: http://localhost:8081
+        predicates:
+          - path:/api/users/**
+        filters:
+          - rewrite-path:/api/users/(?<segment>.*) ? /users/${segment}
+      - id: notification-service
+        uri: http://localhost:8083
+        predicates:
+          - path:/api/notifications/**
+        filters:
+          - rewrite-path:/api/notifications/(?<segment>.*) ? /notifications/${segment}
+      - id: auth-service
+        uri: http://localhost:8081
+        predicates:
+          - path:/api/auth/**
+        filters:
+          - rewrite-path:/api/auth/(?<segment>.*) ? /auth/${segment}
+
+  http:
+    client:
+      read-timeout: 30s
+      connect-timeout: 10s
+    services:
+      user-service:
+        urls:
+          - http://localhost:8081
+          - http://localhost:8082
+      notification-service:
+        urls:
+          - http://localhost:8083
+          - http://localhost:8084
+
+endpoints:
+  health:
+    enabled: true
+    sensitive: false
+  info:
+    enabled: true
+
+logger:
+  levels:
+    io.micronaut.security: DEBUG
+    io.micronaut.http.client: DEBUG
+    io.micronaut.discovery: DEBUG
+    io.micronaut.discovery.consul: DEBUG
+
+consul:
+  client:
+    host: localhost
+    port: 8500
+    registration:
+      enabled: true
+    discovery:
+      enabled: true
+    defaultZone: "${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}"
+
+ratelimit:
+  maxRequests: 100
+  windowMs: 60000 

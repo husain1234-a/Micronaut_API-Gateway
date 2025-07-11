@@ -1,7 +1,7 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.micronaut.application") version "4.5.0"
-    id("io.micronaut.aot") version "4.5.0"
+    id("io.micronaut.application") version "4.3.2"
+    id("io.micronaut.aot") version "4.2.1"
 }
 
 version = "0.1"
@@ -9,8 +9,8 @@ group = "com.example"
 
 repositories {
     mavenCentral()
-    gradlePluginPortal()
 }
+
 
 dependencies {
     // Import Micronaut BOM for consistent versions
@@ -44,13 +44,14 @@ dependencies {
     testImplementation("io.micronaut.security:micronaut-security-jwt")
 }
 
+
 application {
     mainClass.set("com.example.Application")
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 graalvmNative.toolchainDetection = false
@@ -63,6 +64,18 @@ micronaut {
         annotations("com.example.*")
     }
     aot {
-        // enabled = true
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
     }
 }
+
+
+
+
+
+
