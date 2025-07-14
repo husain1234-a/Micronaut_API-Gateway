@@ -13,6 +13,7 @@ repositories {
 
 
 dependencies {
+    implementation("io.micronaut:micronaut-runtime")
     // Import Micronaut BOM for consistent versions
     implementation platform("io.micronaut.platform:micronaut-platform:4.5.0")
 
@@ -32,7 +33,7 @@ dependencies {
     // Minimal Security Dependencies
     implementation("io.micronaut.security:micronaut-security")
     implementation("io.micronaut.security:micronaut-security-jwt")
-
+    runtimeOnly("org.yaml:snakeyaml")
     // Logging
     runtimeOnly("ch.qos.logback:logback-classic")
 

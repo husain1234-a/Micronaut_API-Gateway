@@ -4,7 +4,7 @@ micronaut:
     name: api-gateway
     type: application
   server:
-    port: 8080
+    port: 8085
     cors:
       enabled: true
       configurations:
@@ -37,13 +37,16 @@ micronaut:
           access-token:
             expiration: 3600
     intercept-url-map:
+      - pattern: /**
+        access:
+          - isAnonymous()
       - pattern: /health
         access:
           - isAnonymous()
-      - pattern: /login
+      - pattern: /api/auth/login
         access:
           - isAnonymous()
-      - pattern: /api/auth/login
+      - pattern: /api/auth/**
         access:
           - isAnonymous()
       - pattern: /api/users
@@ -71,19 +74,19 @@ micronaut:
 
   router:
     routes:
-      - id: user-service
+      - id: user-management
         uri: http://localhost:8081
         predicates:
           - path:/api/users/**
         filters:
           - rewrite-path:/api/users/(?<segment>.*) ? /users/${segment}
       - id: notification-service
-        uri: http://localhost:8083
+        uri: http://localhost:9000
         predicates:
           - path:/api/notifications/**
         filters:
           - rewrite-path:/api/notifications/(?<segment>.*) ? /notifications/${segment}
-      - id: auth-service
+      - id: user-management
         uri: http://localhost:8081
         predicates:
           - path:/api/auth/**
@@ -113,8 +116,9 @@ endpoints:
 
 logger:
   levels:
-    io.micronaut.security: DEBUG
-    io.micronaut.http.client: DEBUG
+    io.micronaut.security: TRACE
+    io.micronaut.http: TRACE
+    io.micronaut.web.router: TRACE
     io.micronaut.discovery: DEBUG
     io.micronaut.discovery.consul: DEBUG
 
