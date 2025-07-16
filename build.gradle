@@ -36,7 +36,8 @@ dependencies {
     runtimeOnly("org.yaml:snakeyaml")
     // Logging
     runtimeOnly("ch.qos.logback:logback-classic")
-
+    implementation 'io.projectreactor:reactor-core:3.5.11'
+    testImplementation 'io.projectreactor:reactor-core:3.5.11'
     // Testing
     testImplementation("io.micronaut:micronaut-http-client")
     testImplementation("io.micronaut.test:micronaut-test-junit5")
