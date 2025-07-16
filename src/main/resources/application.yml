@@ -46,7 +46,7 @@ micronaut:
       - pattern: /api/auth/login
         access:
           - isAnonymous()
-      - pattern: /api/auth/**
+      - pattern: /api/users/auth/**
         access:
           - isAnonymous()
       - pattern: /api/users
@@ -86,12 +86,7 @@ micronaut:
           - path:/api/notifications/**
         filters:
           - rewrite-path:/api/notifications/(?<segment>.*) ? /notifications/${segment}
-      - id: user-management
-        uri: http://localhost:8081
-        predicates:
-          - path:/api/auth/**
-        filters:
-          - rewrite-path:/api/auth/(?<segment>.*) ? /auth/${segment}
+      
 
   http:
     client:
