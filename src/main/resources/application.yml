@@ -49,28 +49,22 @@ micronaut:
       - pattern: /api/users/auth/**
         access:
           - isAnonymous()
-      - pattern: /api/users
-        http-method: GET
-        access:
-          - isAuthenticated()
-      - pattern: /api/users
-        http-method: POST
-        access:
-          - hasRole('ADMIN')
       - pattern: /api/users/**
-        http-method: PUT
         access:
-          - hasAnyRole('USER','ADMIN')
-      - pattern: /api/users/**
-        http-method: DELETE
+          - isAnonymous()
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+      - pattern: /api/users
         access:
-          - hasRole('ADMIN')
-      - pattern: /api/notifications/**
-        access:
-          - isAuthenticated()
-      # - pattern: /api/**
-      #   access:
-      #     - isAuthenticated()
+          - isAnonymous()
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
 
   router:
     routes:
