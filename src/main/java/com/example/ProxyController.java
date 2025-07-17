@@ -4,11 +4,11 @@ import io.micronaut.http.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.HttpClient;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.reactivestreams.Publisher;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import reactor.core.publisher.Mono;
-import jakarta.annotation.Nullable;
 
 @Controller("/api/users")
 public class ProxyController {
@@ -40,26 +40,26 @@ public class ProxyController {
                 Mono.just(HttpResponse.status(ex.getStatus()).body(ex.getResponse().getBody(Object.class).orElse(null)))
             );
     }
-
-    @Get("/{path:.*}")
+    
     @Post("/{path:.*}")
+    @Get("/{path:.*}")
     @Put("/{path:.*}")
     @Delete("/{path:.*}")
     public Publisher<HttpResponse<Object>> proxy(@Body String body, HttpRequest<?> request, @PathVariable String path) {
         String targetPath = "/users/" + path;
 
-        System.out.println("Forwarding body: " + body);
-
+        // String rawBody = request.getBody(String.class).orElse(null);
+        // System.out.println("Forwarding body: " + rawBody);
         MutableHttpRequest<Object> proxyRequest = HttpRequest.create(request.getMethod(), targetPath)
             .body(body);
 
+        // Copy all headers
         for (String headerName : request.getHeaders().names()) {
             for (String value : request.getHeaders().getAll(headerName)) {
-                System.out.println("Forwarding header: " + headerName + " = " + value);
                 proxyRequest.header(headerName, value);
             }
         }
-        proxyRequest.header("Content-Type", "application/json");
+        System.out.println("Headers: {}"+proxyRequest +"hello"+ Object.class);
 
         return Mono.from(userServiceClient.exchange(proxyRequest, Object.class))
             .onErrorResume(HttpClientResponseException.class, ex ->

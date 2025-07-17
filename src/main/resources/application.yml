@@ -43,12 +43,22 @@ micronaut:
       - pattern: /health
         access:
           - isAnonymous()
-      - pattern: /api/auth/login
+      - pattern: /api/users/auth/login
         access:
           - isAnonymous()
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
       - pattern: /api/users/auth/**
         access:
           - isAnonymous()
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
       - pattern: /api/users/**
         access:
           - isAnonymous()
